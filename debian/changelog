@@ -1,6 +1,5 @@
-libmspack (0.9-1) stable; urgency=low
+libmspack (0.4-1) unstable; urgency=low
 
-  * Initial Release.
+  * Initial release. (Closes: #711232)
 
- -- Markus Sinner <sinner@herdsoft.com>  Tue, 26 Aug 2003 18:04:14 +0200
-
+ -- Marc Dequènes (Duck) <Duck@DuckCorp.org>  Fri, 16 Aug 2013 23:47:01 +0200

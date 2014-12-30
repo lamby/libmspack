@@ -1,3 +1,10 @@
+libmspack (0.4-2) unstable; urgency=medium
+
+  * Added patch 'qtmd-fix-frame_end-overflow.patch' to fix an overflow
+    causing an infinite loop in some situation (Closes: #773041).
+
+ -- Marc Dequènes (Duck) <Duck@DuckCorp.org>  Tue, 30 Dec 2014 17:40:47 +0100
+
 libmspack (0.4-1) unstable; urgency=low
 
   * Initial release. (Closes: #711232)

@@ -1,3 +1,14 @@
+libmspack (0.4-3) unstable; urgency=medium
+
+  * Added (slightly modified/split) patches from Jakub Wilk to fix
+    programmation errors causing segfaults and security issues:
+    - fix-division-by-zero.patch
+    - fix-pointer-arithmetic-overflow.patch
+    - fix-name-field-boundaries.patch
+    (Closes: #774725, #774726)
+
+ -- Marc Dequènes (Duck) <Duck@DuckCorp.org>  Tue, 13 Jan 2015 22:51:40 +0100
+
 libmspack (0.4-2) unstable; urgency=medium
 
   * Added patch 'qtmd-fix-frame_end-overflow.patch' to fix an overflow

@@ -1,1 +1,4 @@
 qtmd-fix-frame_end-overflow.patch
+fix-division-by-zero.patch
+fix-pointer-arithmetic-overflow.patch
+fix-name-field-boundaries.patch

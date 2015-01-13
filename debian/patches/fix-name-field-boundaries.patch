@@ -1,0 +1,15 @@
+Index: libmspack/mspack/chmd.c
+===================================================================
+--- libmspack.orig/mspack/chmd.c
++++ libmspack/mspack/chmd.c
+@@ -445,7 +445,9 @@ static int chmd_read_headers(struct mspa
+     num_entries = EndGetI16(end);
+ 
+     while (num_entries--) {
+-      READ_ENCINT(name_len); name = p; p += name_len;
++      READ_ENCINT(name_len);
++      if (name_len > end - p) goto chunk_end;
++      name = p; p += name_len;
+       READ_ENCINT(section);
+       READ_ENCINT(offset);
+       READ_ENCINT(length);

@@ -74,8 +74,7 @@ static int cabd_read_headers(
   struct mspack_system *sys, struct mspack_file *fh,
   struct mscabd_cabinet_p *cab, off_t offset, int quiet);
 static char *cabd_read_string(
-  struct mspack_system *sys, struct mspack_file *fh,
-  struct mscabd_cabinet_p *cab, int *error);
+  struct mspack_system *sys, struct mspack_file *fh, int *error);
 
 static struct mscabd_cabinet *cabd_search(
   struct mscab_decompressor *base, const char *filename);
@@ -171,9 +170,9 @@ void mspack_destroy_cab_decompressor(struct mscab_decompressor *base) {
   struct mscab_decompressor_p *self = (struct mscab_decompressor_p *) base;
   if (self) {
     struct mspack_system *sys = self->system;
-    cabd_free_decomp(self);
     if (self->d) {
       if (self->d->infh) sys->close(self->d->infh);
+      cabd_free_decomp(self);
       sys->free(self->d);
     }
     sys->free(self);
@@ -391,14 +390,14 @@ static int cabd_read_headers(struct mspack_system *sys,
 
   /* read name and info of preceeding cabinet in set, if present */
   if (cab->base.flags & cfheadPREV_CABINET) {
-    cab->base.prevname = cabd_read_string(sys, fh, cab, &x); if (x) return x;
-    cab->base.previnfo = cabd_read_string(sys, fh, cab, &x); if (x) return x;
+    cab->base.prevname = cabd_read_string(sys, fh, &x); if (x) return x;
+    cab->base.previnfo = cabd_read_string(sys, fh, &x); if (x) return x;
   }
 
   /* read name and info of next cabinet in set, if present */
   if (cab->base.flags & cfheadNEXT_CABINET) {
-    cab->base.nextname = cabd_read_string(sys, fh, cab, &x); if (x) return x;
-    cab->base.nextinfo = cabd_read_string(sys, fh, cab, &x); if (x) return x;
+    cab->base.nextname = cabd_read_string(sys, fh, &x); if (x) return x;
+    cab->base.nextinfo = cabd_read_string(sys, fh, &x); if (x) return x;
   }
 
   /* read folders */
@@ -502,7 +501,7 @@ static int cabd_read_headers(struct mspack_system *sys,
     file->date_y = (x >> 9) + 1980;
 
     /* get filename */
-    file->filename = cabd_read_string(sys, fh, cab, &x);
+    file->filename = cabd_read_string(sys, fh, &x);
     if (x) { 
       sys->free(file);
       return x;
@@ -518,8 +517,7 @@ static int cabd_read_headers(struct mspack_system *sys,
 }
 
 static char *cabd_read_string(struct mspack_system *sys,
-			      struct mspack_file *fh,
-			      struct mscabd_cabinet_p *cab, int *error)
+			      struct mspack_file *fh, int *error)
 {
   off_t base = sys->tell(fh);
   char buf[256], *str;
@@ -528,8 +526,8 @@ static char *cabd_read_string(struct mspack_system *sys,
   /* read up to 256 bytes */
   len = sys->read(fh, &buf[0], 256);
 
-  /* search for a null terminator in the buffer */
-  for (i = 0, ok = 0; i < len; i++) if (!buf[i]) { ok = 1; break; }
+  /* search for a null terminator in the buffer. reject empty strings */
+  for (i = 1, ok = 0; i < len; i++) if (!buf[i]) { ok = 1; break; }
   if (!ok) {
     *error = MSPACK_ERR_DATAFORMAT;
     return NULL;
@@ -939,6 +937,12 @@ static int cabd_can_merge_folders(struct mspack_system *sys,
         return 0;
     }
 
+    /* check there are not too many data blocks after merging */
+    if ((lfol->base.num_blocks + rfol->base.num_blocks) > CAB_FOLDERMAX) {
+        D(("folder merge: too many data blocks in merged folders"))
+        return 0;
+    }
+
     if (!(lfi = lfol->merge_next) || !(rfi = rfol->merge_prev)) {
         D(("folder merge: one cabinet has no files to merge"))
         return 0;
@@ -991,6 +995,13 @@ static int cabd_extract(struct mscab_decompressor *base,
   sys = self->system;
   fol = (struct mscabd_folder_p *) file->folder;
 
+  /* validate the file's offset and length */
+  if ( (file->offset > CAB_LENGTHMAX) || (file->length > CAB_LENGTHMAX) ||
+      ((file->offset + file->length) > CAB_LENGTHMAX))
+  {
+    return self->error = MSPACK_ERR_DATAFORMAT;
+  }
+
   /* check if file can be extracted */
   if ((!fol) || (fol->merge_prev) ||
       (((file->offset + file->length) / CAB_BLOCKMAX) > fol->base.num_blocks))
@@ -1015,7 +1026,12 @@ static int cabd_extract(struct mscab_decompressor *base,
   }
 
   /* do we need to change folder or reset the current folder? */
-  if ((self->d->folder != fol) || (self->d->offset > file->offset)) {
+  if ((self->d->folder != fol) || (self->d->offset > file->offset) ||
+      !self->d->state)
+  {
+    /* free any existing decompressor */
+    cabd_free_decomp(self);
+
     /* do we need to open a new cab file? */
     if (!self->d->infh || (fol->data.cab != self->d->incab)) {
       /* close previous file handle if from a different cab */
@@ -1099,9 +1115,6 @@ static int cabd_init_decomp(struct mscab_decompressor_p *self, unsigned int ct)
 
   assert(self && self->d);
 
-  /* free any existing decompressor */
-  cabd_free_decomp(self);
-
   self->d->comp_type = ct;
 
   switch (ct & cffoldCOMPTYPE_MASK) {
@@ -1133,7 +1146,7 @@ static int cabd_init_decomp(struct mscab_decompressor_p *self, unsigned int ct)
 }
 
 static void cabd_free_decomp(struct mscab_decompressor_p *self) {
-  if (!self || !self->d || !self->d->folder || !self->d->state) return;
+  if (!self || !self->d || !self->d->state) return;
 
   switch (self->d->comp_type & cffoldCOMPTYPE_MASK) {
   case cffoldCOMPTYPE_NONE:    noned_free((struct noned_state *) self->d->state);   break;
@@ -1264,7 +1277,8 @@ static int cabd_sys_read_block(struct mspack_system *sys,
     /* blocks must not be over CAB_INPUTMAX in size */
     len = EndGetI16(&hdr[cfdata_CompressedSize]);
     if (((d->i_end - d->i_ptr) + len) > CAB_INPUTMAX) {
-      D(("block size > CAB_INPUTMAX (%ld + %d)", d->i_end - d->i_ptr, len))
+      D(("block size > CAB_INPUTMAX (%ld + %d)",
+          (long)(d->i_end - d->i_ptr), len))
       return MSPACK_ERR_DATAFORMAT;
     }
 

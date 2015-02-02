@@ -1,3 +1,61 @@
+2015-01-18  Stuart Caie <kyzer@4u.net>
+
+	* lzxd_decompress(): the byte-alignment code for reading uncompressed
+	block headers presumed it could wind i_ptr back 2 bytes, but this
+	hasn't been true since READ_BYTES was allowed to read bytes straddling
+	two blocks, leaving just 1 byte in the read buffer. Thanks to Jakub
+	Wilk for finding the issue and providing a sample file.
+
+	* inflate(): off-by-one error. Distance codes are 0-29, not 0-30.
+	Thanks to Jakub Wilk again.
+
+	* chmd_read_headers(), search_chunk(): another fix for checking pointer
+	is within a chunk, thanks again to Jakub Wilk.
+
+2015-01-17  Stuart Caie <kyzer@4u.net>
+
+	* GET_UTF8_CHAR(): Remove 5/6-byte encoding support and check decoded
+	chars are no more than U+10FFFF.
+
+	* chmd_init_decomp(): A reset interval of 0 is invalid. Thanks to
+	Jakub Wilk for finding the issue and providing a sample and patch.
+
+2015-01-15  Stuart Caie <kyzer@4u.net>
+
+	* chmd_read_headers(): add a bounds check to prevent over-reading data,
+	which caused a segfault on 32-bit architectures. Thanks to Jakub Wilk.
+
+	* search_chunk(): change the order of pointer arithmetic operations to
+	avoid overflow during bounds checks, which lead to segfaults on 32-bit
+	architectures. Again, thanks to Jakub Wilk for finding this issue,
+	providing sample files and a patch.
+
+2015-01-08  Stuart Caie <kyzer@4u.net>
+
+	* cabd_extract(): No longer uses broken state data if extracting from
+	folder 1, 2, 1 and setting up folder 2 fails. This prevents a jump to
+	null and thus segfault. Thanks to Jakub Wilk again.
+
+	* cabd_read_string: reject empty strings. They are not found in any
+	valid CAB files. Thanks to Hanno Böck for sending me an example.
+
+2015-01-05  Stuart Caie <kyzer@4u.net>
+
+	* cabd_can_merge_folders(): disallow folder merging if the combined
+	folder would have more than 65535 data blocks.
+
+	* cabd_decompress(): disallow files if their offset, length or
+	offset+length is more than 65535*32768, the maximum size of any
+	folder. Thanks to Jakub Wilk for identifying the problem and providing
+	a sample file.
+
+2014-04-20  Stuart Caie <kyzer@4u.net>
+
+	* readhuff.h: fixed the table overflow check, which allowed one more
+	code after capacity had been reached, resulting in a read of
+	uninitialized data inside the decoding table. Thanks to Denis Kroshin
+	for identifying the problem and providing a sample file.
+
 2013-05-27  Stuart Caie <kyzer@4u.net>
 
 	* test/oabx.c: added new example command for unpacking OAB files.

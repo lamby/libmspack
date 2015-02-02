@@ -254,7 +254,7 @@ static const unsigned char guids[32] = {
 #define READ_ENCINT(var) do {			\
     (var) = 0;					\
     do {					\
-	if (p > end) goto chunk_end;		\
+	if (p >= end) goto chunk_end;		\
 	(var) = ((var) << 7) | (*p & 0x7F);	\
     } while (*p++ & 0x80);			\
 } while (0)
@@ -266,7 +266,7 @@ static int chmd_read_headers(struct mspack_system *sys, struct mspack_file *fh,
   unsigned char buf[0x54], *chunk = NULL, *name, *p, *end;
   struct mschmd_file *fi, *link = NULL;
   off_t offset, length;
-  int num_entries, i;
+  int num_entries;
 
   /* initialise pointers */
   chm->files         = NULL;
@@ -445,7 +445,9 @@ static int chmd_read_headers(struct mspack_system *sys, struct mspack_file *fh,
     num_entries = EndGetI16(end);
 
     while (num_entries--) {
-      READ_ENCINT(name_len); name = p; p += name_len;
+      READ_ENCINT(name_len);
+      if (name_len > (unsigned int) (end - p)) goto chunk_end;
+      name = p; p += name_len;
       READ_ENCINT(section);
       READ_ENCINT(offset);
       READ_ENCINT(length);
@@ -686,7 +688,7 @@ static int search_chunk(struct mschmd_header *chm,
 {
     const unsigned char *start, *end, *p;
     unsigned int qr_size, num_entries, qr_entries, qr_density, name_len;
-    unsigned int L, R, M, sec, fname_len, entries_off, is_pmgl;
+    unsigned int L, R, M, fname_len, entries_off, is_pmgl;
     int cmp;
 
     fname_len = strlen(filename);
@@ -746,7 +748,7 @@ static int search_chunk(struct mschmd_header *chm,
 	    /* compare filename with entry QR points to */
 	    p = &chunk[entries_off + (M ? EndGetI16(start - (M << 1)) : 0)];
 	    READ_ENCINT(name_len);
-	    if (p + name_len > end) goto chunk_end;
+	    if (name_len > (unsigned int) (end - p)) goto chunk_end;
 	    cmp = compare(filename, (char *)p, fname_len, name_len);
 
 	    if (cmp == 0) break;
@@ -783,7 +785,7 @@ static int search_chunk(struct mschmd_header *chm,
     *result = NULL;
     while (num_entries-- > 0) {
 	READ_ENCINT(name_len);
-	if (p + name_len > end) goto chunk_end;
+	if (name_len > (unsigned int) (end - p)) goto chunk_end;
 	cmp = compare(filename, (char *)p, fname_len, name_len);
 	p += name_len;
 
@@ -850,35 +852,27 @@ static const unsigned char mspack_tolower_map[256] = {
 };
 #endif
 
-/* decodes a UTF-8 character from s[] into c. Will not read past e. */
+/* decodes a UTF-8 character from s[] into c. Will not read past e. 
+ * doesn't test that extension bytes are %10xxxxxx.
+ * allows some overlong encodings.
+ */
 #define GET_UTF8_CHAR(s, e, c) do {					\
     unsigned char x = *s++;						\
     if (x < 0x80) c = x;						\
-    else if (x < 0xC0) c = -1;						\
-    else if (x < 0xE0) {						\
-	c = (s >= e) ? -1 : ((x & 0x1F) << 6) | (*s++ & 0x3F);		\
+    else if (x >= 0xC2 && x < 0xE0 && s < e) {				\
+	c = (x & 0x1F) << 6 | (*s++ & 0x3F);				\
     }									\
-    else if (x < 0xF0) {						\
-        c = (s+2 > e) ? -1 : ((x & 0x0F) << 12)	| ((s[0] & 0x3F) <<  6)	\
-	    | (s[1] & 0x3F);						\
+    else if (x >= 0xE0 && x < 0xF0 && s+1 < e) {			\
+	c = (x & 0x0F) << 12 | (s[0] & 0x3F) << 6 | (s[1] & 0x3F);	\
 	s += 2;								\
     }									\
-    else if (x < 0xF8) {						\
-	c = (s+3 > e) ? -1 : ((x & 0x07) << 18) | ((s[0] & 0x3F) << 12) \
-	    | ((s[1] & 0x3F) << 6) | (s[2] & 0x3F);			\
+    else if (x >= 0xF0 && x <= 0xF5 && s+2 < e) {			\
+	c = (x & 0x07) << 18 | (s[0] & 0x3F) << 12 |			\
+	    (s[1] & 0x3F) << 6 | (s[2] & 0x3F);				\
+	if (c > 0x10FFFF) c = 0xFFFD;					\
 	s += 3;								\
     }									\
-    else if (x < 0xFC) {						\
-	c = (s+4 > e) ? -1 : ((x & 0x03) << 24) | ((s[0] & 0x3F) << 18) \
-	    | ((s[1] & 0x3F) << 12)|((s[2] & 0x3F) << 6)|(s[3] & 0x3F);	\
-	s += 4;								\
-    }									\
-    else if (x < 0xFE) {						\
-        c = (s+5>e)?-1:((x&1)<<30)|((s[0]&0x3F)<<24)|((s[1]&0x3F)<<18)| \
-	    ((s[2] & 0x3F) << 12) | ((s[3] & 0x3F) << 6)|(s[4] & 0x3F);	\
-	s += 5;								\
-    }									\
-    else c = -1;							\
+    else c = 0xFFFD;							\
 } while (0)
 
 /* case-insensitively compares two UTF8 encoded strings. String length for
@@ -1123,7 +1117,7 @@ static int chmd_init_decomp(struct mschm_decompressor_p *self,
   }
 
   /* validate reset_interval */
-  if (reset_interval % LZX_FRAME_SIZE) {
+  if (reset_interval == 0 || reset_interval % LZX_FRAME_SIZE) {
     D(("bad controldata reset interval"))
     return self->error = MSPACK_ERR_DATAFORMAT;
   }

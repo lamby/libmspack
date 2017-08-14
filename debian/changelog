@@ -3,6 +3,7 @@ libmspack (0.6-1) unstable; urgency=medium
   * New upstream release:
     + Fix CVE-2017-6419 (Closes: #871263)
     + Fix CVE-2017-11423 (Closes: #868956)
+  * Fix building documentation.
 
  -- Marc Dequènes (Duck) <Duck@DuckCorp.org>  Tue, 15 Aug 2017 06:08:38 +0900
 

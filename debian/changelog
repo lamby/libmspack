@@ -5,6 +5,7 @@ libmspack (0.6-1) unstable; urgency=medium
     + Fix CVE-2017-11423 (Closes: #868956)
   * Fix building documentation.
   * Use HTTPS in package metadata.
+  * Transition to automatic debug packages.
 
  -- Marc Dequènes (Duck) <Duck@DuckCorp.org>  Tue, 15 Aug 2017 06:08:38 +0900
 

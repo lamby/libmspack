@@ -6,6 +6,7 @@ libmspack (0.6-1) unstable; urgency=medium
   * Fix building documentation.
   * Use HTTPS in package metadata.
   * Transition to automatic debug packages.
+  * Package now conforms to Standards-Version 4.0.0.
 
  -- Marc Dequènes (Duck) <Duck@DuckCorp.org>  Tue, 15 Aug 2017 06:08:38 +0900
 

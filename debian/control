@@ -6,8 +6,8 @@ Standards-Version: 3.9.4
 Build-Depends: dpkg-dev (>= 1.16.1.1), debhelper (>= 9), dh-autoreconf,
  autotools-dev
 Vcs-Git: git://git.debian.org/collab-maint/libmspack.git
-Vcs-Browser: http://git.debian.org/?p=collab-maint/libmspack.git;a=summary
-Homepage: http://www.cabextract.org.uk/libmspack/
+Vcs-Browser: https://git.debian.org/?p=collab-maint/libmspack.git;a=summary
+Homepage: https://www.cabextract.org.uk/libmspack/
 
 Package: libmspack0
 Architecture: any

@@ -1,7 +1,7 @@
 # -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([libmspack],[0.5alpha],[kyzer@4u.net])
+AC_INIT([libmspack],[0.6alpha],[kyzer@cabextract.org.uk])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([mspack/mspack.h])
@@ -24,13 +24,14 @@ AM_CONDITIONAL(DEBUG, test x$enable_debug = 'xyes')
 # Checks for programs.
 AC_PROG_CC
 AM_CONDITIONAL(GCC, test x$GCC = 'xyes')
+AM_PROG_AR
 AC_PROG_INSTALL
 LT_INIT
 AC_EXEEXT
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([ctype.h limits.h stdlib.h wctype.h])
+AC_CHECK_HEADERS([ctype.h inttypes.h limits.h stdlib.h wctype.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -39,6 +40,9 @@ AC_TYPE_MODE_T
 AC_TYPE_OFF_T
 AC_TYPE_SIZE_T
 AC_CHECK_SIZEOF([off_t])
+
+# Checks for library functions
+AX_FUNC_MKDIR
 AC_CHECK_FUNCS([tolower towlower])
 
 # largefile support

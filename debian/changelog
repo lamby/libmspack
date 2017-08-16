@@ -1,3 +1,9 @@
+libmspack (0.6-2) UNRELEASED; urgency=medium
+
+  * Missing dependency on 'doxygen' for doc creation (Closes: #872193)
+
+ -- Marc Dequènes (Duck) <Duck@DuckCorp.org>  Thu, 17 Aug 2017 07:43:42 +0900
+
 libmspack (0.6-1) unstable; urgency=medium
 
   * New upstream release:

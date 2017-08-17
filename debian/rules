@@ -9,12 +9,12 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 override_dh_autoreconf:
 	dh_autoreconf --as-needed
 
-override_dh_auto_build:
+override_dh_auto_build-indep:
 	dh_auto_build
 	$(MAKE) -C doc
 
 override_dh_auto_clean:
-	$(MAKE) -C doc clean
+	[ -f doc/Makefile ] && $(MAKE) -C doc clean
 	# not enough
 	rm -rf doc/menu.js doc/menudata.js
 	dh_auto_clean

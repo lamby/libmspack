@@ -1,3 +1,9 @@
+libmspack (0.6-3) unstable; urgency=medium
+
+  * Move doc generation in dh's indep rules to fix FTBFS
+
+ -- Marc Dequènes (Duck) <Duck@DuckCorp.org>  Thu, 17 Aug 2017 09:49:02 +0900
+
 libmspack (0.6-2) unstable; urgency=medium
 
   * Missing dependency on 'doxygen' for doc creation (Closes: #872193)

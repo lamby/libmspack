@@ -1,3 +1,14 @@
+libmspack (0.5-1+deb8u1) jessie-security; urgency=high
+
+  * Non-maintainer upload.
+  * Correct rejection of empty strings.
+  * Fix mis-handling of sys->read() errors in cabd_read_string()
+    (CVE-2017-11423) (Closes: #868956).
+  * Reject negative output length in SpanInfo (CVE-2017-6419)
+    (Closes: #871263).
+
+ -- Sebastian Andrzej Siewior <sebastian@breakpoint.cc>  Wed, 16 Aug 2017 21:42:50 +0200
+
 libmspack (0.5-1) unstable; urgency=medium
 
   * New upstream fix-only release:

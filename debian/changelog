@@ -1,3 +1,9 @@
+libmspack (0.6-4) UNRELEASED; urgency=medium
+
+  * Updated VCS URLs (Alioth->Salsa).
+
+ -- Marc Dequènes (Duck) <Duck@DuckCorp.org>  Thu, 05 Apr 2018 12:20:26 +0900
+
 libmspack (0.6-3) unstable; urgency=medium
 
   * Move doc generation in dh's indep rules to fix FTBFS

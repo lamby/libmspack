@@ -2,7 +2,7 @@ Source: libmspack
 Section: libs
 Priority: optional
 Maintainer: Marc Dequènes (Duck) <Duck@DuckCorp.org>
-Standards-Version: 4.0.0
+Standards-Version: 4.1.4
 Build-Depends: dpkg-dev (>= 1.16.1.1), debhelper (>= 11)
 Build-Depends-indep: doxygen
 Vcs-Browser: https://salsa.debian.org/debian/libmspack

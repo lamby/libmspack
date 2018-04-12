@@ -1,6 +1,7 @@
 libmspack (0.6-4) UNRELEASED; urgency=medium
 
   * Updated VCS URLs (Alioth->Salsa).
+  * Switch to compat level 11.
 
  -- Marc Dequènes (Duck) <Duck@DuckCorp.org>  Thu, 05 Apr 2018 12:20:26 +0900
 

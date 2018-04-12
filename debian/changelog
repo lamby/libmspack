@@ -1,4 +1,4 @@
-libmspack (0.6-4) UNRELEASED; urgency=medium
+libmspack (0.6-4) unstable; urgency=medium
 
   * Updated VCS URLs (Alioth->Salsa).
   * Switch to compat level 11.
@@ -6,7 +6,7 @@ libmspack (0.6-4) UNRELEASED; urgency=medium
   * Add missing build dependency on 'graphviz' for the documentation.
   * Adapt doc reference since it is now in the main package.
 
- -- Marc Dequènes (Duck) <Duck@DuckCorp.org>  Thu, 05 Apr 2018 12:20:26 +0900
+ -- Marc Dequènes (Duck) <Duck@DuckCorp.org>  Thu, 12 Apr 2018 19:26:12 +0900
 
 libmspack (0.6-3) unstable; urgency=medium
 

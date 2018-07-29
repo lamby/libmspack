@@ -1,3 +1,13 @@
+libmspack (0.7-1) UNRELEASED; urgency=medium
+
+  * NUR:
+    + fix CVE-2018-14679 (Closes: #904802)
+    + fix CVE-2018-14680 (Closes: #904801)
+    + fix CVE-2018-14682 (Closes: #904800)
+    + fix CVE-2018-14681 (Closes: #904799)
+
+ -- Marc Dequènes (Duck) <Duck@DuckCorp.org>  Sun, 29 Jul 2018 18:47:13 +0900
+
 libmspack (0.6-4) unstable; urgency=medium
 
   * Updated VCS URLs (Alioth->Salsa).

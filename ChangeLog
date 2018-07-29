@@ -1,3 +1,36 @@
+2018-04-26  Stuart Caie <kyzer@cabextract.org.uk>
+
+	* read_chunk(): the test that chunk numbers are in bounds was off
+	by one, so read_chunk() returned a pointer taken from outside
+	allocated memory that usually crashes libmspack when accessed.
+	Thanks to Hanno Böck for finding the issue and providing a sample.
+
+	* chmd_read_headers(): reject files with blank filenames. Thanks
+	again to Hanno Böck for finding the issue and providing a sample file.
+
+2018-02-06  Stuart Caie <kyzer@cabextract.org.uk>
+
+	* chmd.c: fixed an off-by-one error in the TOLOWER() macro, reported
+	by Dmitry Glavatskikh. Thanks Dmitry!
+
+2017-11-26  Stuart Caie <kyzer@cabextract.org.uk>
+
+	* kwajd_read_headers(): fix up the logic of reading the filename and
+	extension headers to avoid a one or two byte overwrite. Thanks to
+	Jakub Wilk for finding the issue.
+
+	* test/kwajd_test.c: add tests for KWAJ filename.ext handling
+
+2017-10-16  Stuart Caie <kyzer@cabextract.org.uk>
+
+	* test/cabd_test.c: update the short string tests to expect not only
+	MSPACK_ERR_DATAFORMAT but also MSPACK_ERR_READ, because of the recent
+	change to cabd_read_string(). Thanks to maitreyee43 for spotting this.
+
+	* test/msdecompile_md5: update the setup instructions for this script,
+	and also change the script so it works with current Wine. Again, thanks
+	to maitreyee43 for trying to use it and finding it not working.
+
 2017-08-13  Stuart Caie <kyzer@cabextract.org.uk>
 
 	* src/chmextract.c: support MinGW one-arg mkdir(). Thanks to AntumDeluge
@@ -138,9 +171,9 @@
 
 2011-11-23  Stuart Caie <kyzer@4u.net>
 
-	* chmd_fast_find(): add a simple check against infinite PGML
+	* chmd_fast_find(): add a simple check against infinite PMGL
 	loops. Thanks to Sergei Trofimovich for finding sample files.
-	Multi-step PGML or PGMI infinite loops remain possible.
+	Multi-step PMGL/PMGI infinite loops remain possible.
 
 2011-06-17  Stuart Caie <kyzer@4u.net>
 
@@ -259,7 +292,7 @@
 2011-04-26:  Stuart Caie <kyzer@4u.net>
 
 	* test/chminfo.c: more sanity checks for corrupted CHM files where
-	entries go past the end of a PGML/PGMI chunk, thanks to
+	entries go past the end of a PMGL/PMGI chunk, thanks to
 	Sergei Trofimovich for sending me examples and analysis.
 
 2011-04-25:  Stuart Caie <kyzer@4u.net>

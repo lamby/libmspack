@@ -1,4 +1,4 @@
-libmspack (0.7-1) UNRELEASED; urgency=medium
+libmspack (0.7-1) unstable; urgency=medium
 
   * NUR:
     + fix CVE-2018-14679 (Closes: #904802)
@@ -8,7 +8,7 @@ libmspack (0.7-1) UNRELEASED; urgency=medium
   * Add lintian exception for source-contains-prebuilt-ms-help-file in
     the test files.
 
- -- Marc Dequènes (Duck) <Duck@DuckCorp.org>  Sun, 29 Jul 2018 18:47:13 +0900
+ -- Marc Dequènes (Duck) <Duck@DuckCorp.org>  Sun, 29 Jul 2018 18:53:39 +0900
 
 libmspack (0.6-4) unstable; urgency=medium
 
